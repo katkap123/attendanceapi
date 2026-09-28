@@ -1,11 +1,20 @@
-FROM eclipse-temurin:21-jdk
+# Stage 1: Build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-COPY . .
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-RUN chmod +x mvnw
+COPY src ./src
 
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
-CMD ["sh", "-c", "export KAFKA_SSL_TRUSTSTORE_CERTIFICATES=\"$(cat /etc/secrets/ca.pem)\" && exec java -jar target/attendance-0.0.1-SNAPSHOT.jar"]
+# Stage 2: Run
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+COPY --from=build /app/target/attendance-0.0.1-SNAPSHOT.jar app.jar
+
+CMD ["sh", "-c", "export KAFKA_SSL_TRUSTSTORE_CERTIFICATES=\"$(cat /etc/secrets/ca.pem)\" && exec java -jar app.jar"]
