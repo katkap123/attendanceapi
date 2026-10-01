@@ -74,7 +74,7 @@ public CorsConfigurationSource corsConfigurationSource() {
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/teacher/**").hasRole("TEACHER")
+                .requestMatchers("/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
                 .requestMatchers("/api/student/**").hasRole("STUDENT")
                 .anyRequest().authenticated()
             )
