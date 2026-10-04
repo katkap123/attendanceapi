@@ -86,6 +86,11 @@ public class AttendanceService {
             RecordClassAttendanceRequest request,
             UUID recordedBy,
             boolean isAdmin) {
+        if (request.attendanceDate().isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException(
+                        "Attendance cannot be recorded for a future date"
+                );
+        }
 
         SchoolClass schoolClass = schoolClassRepository
                 .findById(classId)
