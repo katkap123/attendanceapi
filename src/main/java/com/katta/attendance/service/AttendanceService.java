@@ -166,6 +166,32 @@ public class AttendanceService {
         return results;
     }
 
+    public List<Attendance> getClassAttendance(
+        UUID classId,
+        LocalDate attendanceDate,
+        UUID requestedBy,
+        boolean isAdmin) {
+
+        SchoolClass schoolClass = schoolClassRepository
+                .findById(classId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Class not found"));
+
+        if (!isAdmin &&
+                !schoolClass.getClassTeacherId().equals(requestedBy)) {
+
+        throw new SecurityException(
+                "You are not authorized to view attendance for this class"
+        );
+        }
+
+        return attendanceRepository
+                .findByClassIdAndAttendanceDate(
+                        classId,
+                        attendanceDate
+                );
+        }
+
     public List<Attendance> getStudentAttendance(
         UUID studentId,
         LocalDate startDate,

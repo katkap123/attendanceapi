@@ -12,14 +12,20 @@ import com.katta.attendance.model.Attendance;
 public interface AttendanceRepository
         extends JpaRepository<Attendance, UUID> {
 
-    List<Attendance> findByStudentIdAndAttendanceDateBetweenOrderByAttendanceDateAsc(
-            UUID studentId,
-            LocalDate startDate,
-            LocalDate endDate
-    );
-    Optional<Attendance> findByStudentIdAndClassIdAndAttendanceDate(
-        UUID studentId,
+        List<Attendance> findByStudentIdAndAttendanceDateBetweenOrderByAttendanceDateAsc(
+                UUID studentId,
+                LocalDate startDate,
+                LocalDate endDate
+        );
+        
+        Optional<Attendance> findByStudentIdAndClassIdAndAttendanceDate(
+                        UUID studentId,
+                        UUID classId,
+                        LocalDate attendanceDate
+                );
+
+        List<Attendance> findByClassIdAndAttendanceDate(
         UUID classId,
-        LocalDate attendanceDate
-);
+        LocalDate attendanceDate);
+
 }

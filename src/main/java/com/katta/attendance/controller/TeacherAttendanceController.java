@@ -1,15 +1,18 @@
 package com.katta.attendance.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.katta.attendance.dto.CreateAttendanceRequest;
@@ -61,6 +64,32 @@ public class TeacherAttendanceController {
                 .status(HttpStatus.CREATED)
                 .body(attendance);
     }
+
+    @GetMapping("/class/{classId}")
+        public ResponseEntity<List<Attendance>> getClassAttendance(
+                @PathVariable UUID classId,
+                @RequestParam LocalDate date,
+                @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+
+        UUID userId = jwtService.extractUserId(token);
+
+        List<String> roles = jwtService.extractRoles(token);
+
+        boolean isAdmin =
+                roles != null && roles.contains("ADMIN");
+
+        List<Attendance> attendance =
+                attendanceService.getClassAttendance(
+                        classId,
+                        date,
+                        userId,
+                        isAdmin
+                );
+
+        return ResponseEntity.ok(attendance);
+        }
 
     @PostMapping
     public ResponseEntity<Attendance> recordAttendance(
